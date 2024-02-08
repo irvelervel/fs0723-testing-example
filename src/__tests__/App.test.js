@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import App from '../App'
 
 // qui dentro scriveremo i nostri tests, per App e (per comodità) anche per gli altri componenti
@@ -34,6 +34,16 @@ describe('General mounting', () => {
     // 3) non c'è, perchè con un titolo non abbiamo interazione
     // 4) ci aspettiamo che il button si trovi nel documento (del VIRTUAL DOM)
     expect(button).toBeInTheDocument()
+  })
+
+  it('correctly mounts the reservation list heading', () => {
+    // 1) monto App nel VIRTUAL DOM
+    render(<App />) // non comparirà nella pagina, è un montaggio "virtuale"
+    // 2) cerco tramite il suo contenuto testuale il titolo della lista
+    const listHeading = screen.getByText(/lista prenotazioni/i)
+    // 3) non c'è, perchè con un titolo non abbiamo interazione
+    // 4) ci aspettiamo che il titolo si trovi nel documento (del VIRTUAL DOM)
+    expect(listHeading).toBeInTheDocument()
   })
 })
 
@@ -81,5 +91,23 @@ describe('Primary button behavior', () => {
 
     const oldButton = screen.queryByText(/show section/i)
     expect(oldButton).not.toBeInTheDocument()
+  })
+})
+
+describe('FetchComponent behavior', () => {
+  it("doesn't render any ListGroup.Item at page load", () => {
+    render(<App />)
+    const allTheLIs = screen.queryAllByTestId('listgroup-item')
+    expect(allTheLIs).toHaveLength(0)
+  })
+
+  it('renders two listgroup items after fetch is complete', async () => {
+    render(<App />)
+    await waitFor(() => {
+      // risolviamo le Promise nel componente
+      // qui dentro la Promise è terminata al 100%
+      const allTheLIsAfterFetch = screen.queryAllByTestId('listgroup-item')
+      expect(allTheLIsAfterFetch).toHaveLength(0) // perchè non ci sono prenotazione
+    })
   })
 })
