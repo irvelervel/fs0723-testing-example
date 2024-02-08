@@ -15,7 +15,7 @@ const HiddenSection = () => {
             setShow(!show)
           }}
         >
-          SHOW SECTION
+          {show ? 'HIDE' : 'SHOW'} SECTION
         </Button>
         {show && (
           <Card>
